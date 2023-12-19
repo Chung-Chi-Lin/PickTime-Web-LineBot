@@ -1,0 +1,20 @@
+// 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
+@import "bootstrap/scss/functions";
+
+// 2. Include any default variable overrides here
+@import "./helpers/variables";
+// 3. Include remainder of required Bootstrap stylesheets
+
+// 可以分別載入需要的資源減少專案大小，在此先載入全部樣式
+@import "bootstrap/scss/bootstrap";
+
+//@import "~bootstrap/scss/maps";
+//@import "~bootstrap/scss/mixins";
+//@import "~bootstrap/scss/root";
+
+//custom
+@import "./helpers/utilities";
+@import "./helpers/base/fontStyle";
+@import "./helpers/components/btn.scss";
+@import "./helpers/components/loading.scss";
+

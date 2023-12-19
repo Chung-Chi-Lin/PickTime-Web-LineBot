@@ -1,0 +1,18 @@
+// btn+shadow
+.btn-h {
+  &:hover {
+  transform: translateY(-6px);
+  box-shadow: 3px 6px 8px black;
+  }
+}
+.btn-li-h {
+  &:hover {
+    color: #ff9b30;
+    font-size: large;
+  }
+}
+
+.tab {
+  border-bottom: 4px solid #ff9b30;
+  color: #ff9b30;
+}
