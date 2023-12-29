@@ -1,0 +1,29 @@
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # This is the branch that will trigger the build
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build Project
+      run: npm run build
+      env:
+        VITE_APP_API: ${{ secrets.VITE_APP_API }}  # Using the secret as an environment variable
+
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages  # Deploying to the gh-pages branch
+        folder: dist  # The folder with your build assets
