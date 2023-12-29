@@ -86,9 +86,13 @@ export default {
           // 設置 axios 的默認授權頭部
           this.$http.defaults.headers.common.Authorization = `Bearer ${token}`;
           this.isLoading = false;
-
-          // 導航到 rideShare 頁面
-          this.$router.push('/rideShare');
+          console.log(response.data.userInfo.userType === '乘客')
+          // 導航到對應 rideShare 頁面
+          if (response.data.userInfo.userType === '乘客') {
+            this.$router.push('/passengerRideShare');
+          } else {
+            this.$router.push('/driverRideShare');
+          }
         })
         .catch((err) => {
           this.isLoading = false;

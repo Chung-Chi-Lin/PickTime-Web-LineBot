@@ -12,9 +12,15 @@ const routes = [
     component: () => import('../../../TodoList-Web/src/views/signUp.vue'),
   },
   {
-    path: '/rideShare',
-    name: 'rideShare',
-    component: () => import('../../../TodoList-Web/src/views/rideShare.vue'),
+    path: '/passengerRideShare',
+    name: 'passengerRideShare',
+    component: () => import('../../../TodoList-Web/src/views/passengerRideShare.vue'),
+    props: (route) => route.params,
+  },
+  {
+    path: '/driverRideShare',
+    name: 'driverRideShare',
+    component: () => import('../../../TodoList-Web/src/views/driverRideShare.vue'),
     props: (route) => route.params,
   },
 ];

@@ -199,7 +199,7 @@ export default {
         });
         return;
       }
-      const url = `${process.env.VUE_APP_API}/users/register`;
+      const url = `${import.meta.env.VITE_APP_API}/users/register`;
       const data = {
         email: this.user.email,
         name: this.user.userName,

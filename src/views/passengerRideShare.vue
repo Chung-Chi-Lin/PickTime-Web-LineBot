@@ -31,10 +31,9 @@
       </div>
     </header>
     <main class="container pb-5">
-      <div class="input-group mb-3" v-if="filteredType === '當月車費'">
+      <div class="input-group mb-3" v-if="filteredType === '當月車費' && userInfo.userType === '乘客'">
         <span class="input-group-text fs-4">$</span>
-        <input v-if="userInfo.userType === '司機' || userInfo.userType === 'admin'"
-               v-model.number="amount" type="number" onkeyup="value=value.replace(/D+/g, 0)"
+        <input v-model.number="amount" type="number" onkeyup="value=value.replace(/D+/g, 0)"
                class="form-control border-0 py-2" placeholder="輸入匯款金額" id="numberInput">
         <label class="input-group-text px-1 py-1 bg-white border-0" for="todo">
           <button class="btn btn-sm" @click="addAmount" type="button" id="button-addon2">
@@ -145,175 +144,56 @@
           </div>
           <ul class="list-group border-top my-4 border-3 border-secondary list-group-flush">
           </ul>
-          <h3 class="ms-1 mb-0"><span class="badge bg-success p-2">您的搭乘表</span></h3>
-          <ul class="list-group list-group-flush"
-              v-for="(item, index) in formattedPassengerData" :key="item.id">
-            <li class="list-group-item text-start border-bottom">
-              <div class="d-flex justify-content-end m-0 p-0">
-                <button class="btn btn" @click="delTakeRide(item.id)" type="button" id="button-addon2">
-                  <i class="bi bi-x-square-fill fs-4" style="color: #ff0000;"></i>
-                </button>
-              </div>
-              <div class="mb-3">
-                <label class="form-check-label d-block mb-2">
-                  <span v-if="index === 0">*本月搭乘日＞ </span>
-                  <span v-else>不搭車日＞ </span>
-                  備註:{{ item.note ?? '無備註' }}
-                </label>
-                <label class="text-end d-block">
-                  日期:{{item.start_date}} {{ item.end_date ? `～ ${item.end_date}` : ''}}
-                </label>
-              </div>
-            </li>
-          </ul>
-          <h3 class="mt-4 ms-1 mb-0"><span class="badge bg-primary p-2">司機表</span></h3>
-          <ul class="list-group list-group-flush"
-              v-for="(item, index) in formattedDriveData" :key="item.id">
-            <li class="list-group-item text-start border-bottom">
-              <div class="mb-3">
-                <label v-if="item.pass_limit" class="text-end d-block mb-3">
-                  <h5>{{ item.pass_limit ? `乘客限:${item.pass_limit}位` : '' }}</h5>
-                </label>
-                <label class="form-check-label d-block mb-2">
-                  <span v-if="index === 0 && item.pass_limit">*本月開車日＞ </span>
-                  <span v-else>不開車日＞ </span>
-                  備註:{{ item.note ?? '無備註' }}
-                </label>
-                <label class="text-end d-block">
-                  日期:{{item.start_date}} {{ item.end_date ? `～ ${item.end_date}` : ''}}
-                </label>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <!-- 開車登記 -->
-        <div class="card-body" v-if="filteredType === '開車登記'">
+          <h3 class="ms-1 mb-0"><span class="badge bg-success p-2">{{ takeRideData ? '您的搭乘表' : '尚無預約'}}</span></h3>
           <div>
-            <h5 class="d-inline mb-3 me-3">搭乘選項:</h5>
-            <div class="form-check form-check-inline mb-3">
-              <input
-                  v-model="reverseType"
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions2"
-                  id="inlineRadio3"
-                  value="true"
-              >
-              <label class="form-check-label" for="inlineRadio3">搭乘</label>
-            </div>
-            <div class="form-check form-check-inline mb-3">
-              <input
-                  v-model="reverseType"
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions2"
-                  id="inlineRadio4"
-                  :value="false"
-              >
-              <label class="form-check-label" for="inlineRadio4">不搭乘</label>
-            </div>
+            <ul class="list-group list-group-flush"
+                v-for="(item, index) in formattedPassengerData" :key="item.id">
+              <li class="list-group-item text-start border-bottom" v-if="item.id !== null">
+                <div class="d-flex justify-content-end m-0 p-0">
+                  <button class="btn btn" @click="delTakeRide(item.id)" type="button" id="button-addon2">
+                    <i class="bi bi-x-square-fill fs-4" style="color: #ff0000;"></i>
+                  </button>
+                </div>
+                <div class="mb-3">
+                  <label class="form-check-label d-block mb-2">
+                    <span v-if="index === 0">*本月搭乘日＞ </span>
+                    <span v-else>不搭車日＞ </span>
+                    備註:{{ item.note ?? '無備註' }}
+                  </label>
+                  <label class="text-end d-block">
+                    <span v-if="index === 0">搭車</span>
+                    <span v-else>不搭車</span>日期:{{item.start_date}} {{ item.end_date ? `～ ${item.end_date}` : ''}}
+                  </label>
+                </div>
+              </li>
+            </ul>
           </div>
-          <div>
-            <h5 class="d-inline mb-3 me-3">日期範圍:</h5>
-            <div class="form-check form-check-inline mb-3">
-              <input
-                  v-model="isRange"
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="inlineRadio2"
-                  :value="false"
-              >
-              <label class="form-check-label" for="inlineRadio2">單日</label>
-            </div>
-            <div class="form-check form-check-inline mb-3">
-              <input
-                  v-model="isRange"
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="inlineRadio1"
-                  value="true"
-              >
-              <label class="form-check-label" for="inlineRadio1">日期區間</label>
-            </div>
-          </div>
-          <div v-if="!isRange">
-            <h5 class="mb-3">選擇單日</h5>
-            <DatePicker
-                name="singleDate"
-                type="day"
-                format="YYYY/MM/DD"
-                v-model:value="selectedDate"
-                :disabled-date="disabledDates"
-            />
-          </div>
-          <div v-else>
-            <h5 class="mb-3">選擇搭乘區間</h5>
-            <div class="d-flex">
-              <DatePicker
-                  name="startDate"
-                  type="day"
-                  format="YYYY/MM/DD"
-                  v-model:value="startDate"
-                  :disabled-date="disabledDates"
-              />
-              <div class="px-3">～</div>
-              <DatePicker
-                  name="endDate"
-                  type="day"
-                  format="YYYY/MM/DD"
-                  v-model:value="endDate"
-                  :disabled-date="disabledDates"
-              />
-            </div>
-          </div>
-          <div class="bg-transparent d-flex justify-content-end mt-3">
-            <button type="button" class="btn btn-info border-0 btn-h p-2 px-3" @click="reserveDate">預約</button>
-          </div>
-          <ul class="list-group border-top my-4 border-3 border-secondary list-group-flush">
+          <ul v-if="!takeRideData" class="list-group border-top my-4 border-3 border-secondary list-group-flush">
           </ul>
-          <h3 class="ms-1 mb-0"><span class="badge bg-success p-2">您的搭乘表</span></h3>
-          <ul class="list-group list-group-flush"
-              v-for="(item, index) in formattedPassengerData" :key="item.id">
-            <li class="list-group-item text-start border-bottom">
-              <div class="d-flex justify-content-end m-0 p-0">
-                <button class="btn btn" @click="delTakeRide(item.id)" type="button" id="button-addon2">
-                  <i class="bi bi-x-square-fill fs-4" style="color: #ff0000;"></i>
-                </button>
-              </div>
-              <div class="mb-3">
-                <label class="form-check-label d-block mb-2">
-                  <span v-if="index === 0">*本月搭乘日＞ </span>
-                  <span v-else>不搭車日＞ </span>
-                  備註:{{ item.note ?? '無備註' }}
-                </label>
-                <label class="text-end d-block">
-                  日期:{{item.start_date}} {{ item.end_date ? `～ ${item.end_date}` : ''}}
-                </label>
-              </div>
-            </li>
-          </ul>
-          <h3 class="mt-4 ms-1 mb-0"><span class="badge bg-primary p-2">司機表</span></h3>
-          <ul class="list-group list-group-flush"
-              v-for="(item, index) in formattedDriveData" :key="item.id">
-            <li class="list-group-item text-start border-bottom">
-              <div class="mb-3">
-                <label v-if="item.pass_limit" class="text-end d-block mb-3">
-                  <h5>{{ item.pass_limit ? `乘客限:${item.pass_limit}位` : '' }}</h5>
-                </label>
-                <label class="form-check-label d-block mb-2">
-                  <span v-if="index === 0 && item.pass_limit">*本月開車日＞ </span>
-                  <span v-else>不開車日＞ </span>
-                  備註:{{ item.note ?? '無備註' }}
-                </label>
-                <label class="text-end d-block">
-                  日期:{{item.start_date}} {{ item.end_date ? `～ ${item.end_date}` : ''}}
-                </label>
-              </div>
-            </li>
-          </ul>
+          <h3 class="mt-4 ms-1 mb-0"><span class="badge bg-primary p-2">{{ driveData ? '司機表' : '司機尚無開放預約'}}</span></h3>
+          <div v-if="driveData">
+            <ul class="list-group list-group-flush"
+                v-for="(item, index) in formattedDriveData" :key="item.id">
+              <li class="list-group-item text-start border-bottom">
+                <div class="mb-3">
+                  <label v-if="item.pass_limit" class="text-end d-block mb-3">
+                    <h5>{{ item.pass_limit ? `乘客限:${item.pass_limit}位` : '' }}</h5>
+                  </label>
+                  <label class="form-check-label d-block mb-2">
+                    <span v-if="index === 0 && item.pass_limit">*本月開車日＞ </span>
+                    <span v-else>不開車日＞ </span>
+                    備註:{{ item.note ?? '無備註' }}
+                  </label>
+                  <label class="text-end d-block">
+                    <span v-if="index === 0">開車</span>
+                    <span v-else>不開車</span>日期:{{item.start_date}} {{ item.end_date ? `～ ${item.end_date}` : ''}}
+                  </label>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
+        <!-- 當月、上月車費 -->
         <div class="card-body" v-if="filteredType !== '搭乘登記' && filteredType !== '開車登記'">
           <ul class="list-group list-group-flush"
             v-for="(item, index) in formattedFareData" :key="item.id">
@@ -346,16 +226,6 @@
     </main>
   </div>
 </template>
-<style>
-@media (min-width: 768px) {
-    .todo-bg {
-      min-height: 100vh;
-      /* background-image: linear-gradient(174deg, #ffd370 2%, #ffd370 46%,
-      #ffffff 46%, #ffffff 100%, #e8e8e8 100%); */
-      background: linear-gradient(0deg, rgb(216, 254, 255) 0%, rgba(253,187,45,1) 100%);
-    }
-  }
-</style>
 <script>
 import Swal from 'sweetalert2';
 import { mapGetters } from 'vuex';
@@ -375,23 +245,24 @@ export default {
       isRange: false, // radio是否為區間
       reverseType: true, // 搭乘、不搭
       formattedFareData: [], // 組合後的車費數據
-      fareData: [], // 儲存fare數據
-      fareCountData: [], // 儲存fareCount數據
-      formattedDriveData: [],
+      fareData: [],
+      fareCountData: [],
+      formattedDriveData: [], // 組合後的司機數據
       driveData: [],
       notDriveData: [],
-      formattedPassengerData: [],
+      formattedPassengerData: [], // 組合後的乘客數據
       takeRideData: [],
       notTakeRideData: [],
-      fareCountTotal: '',
-      amount: null,
+      fareCountTotal: '', // 搭乘紀錄總計算
+      amount: null, // 匯款費
       isLoading: false,
       filteredType: '當月車費',
-      category: ['當月車費', '上月車費', '搭乘登記', '開車登記'],
+      category: ['當月車費', '上月車費', '搭乘登記'],
     };
   },
   methods: {
     // ===== 費用處理 =====
+    // 取得乘客當前費用紀錄
     async getFareData() {
       const { userType, email } = this.userInfo;
       const { token } = this.$store.state;
@@ -410,20 +281,12 @@ export default {
           this.fareData = fareData.fare; // fare data
           this.fareCountData = fareData.fareCount; // fareCount data
           this.updateFormattedFareDate(this.filteredType); // 你可能需要傳入當前的 filteredType
-          if (userType === '乘客') {
-            this.category = ['當月車費', '上月車費', '搭乘登記'];
-          }
-          if (userType === '司機') {
-            this.category = ['當月車費', '上月車費', '開車登記'];
-          }
-          if (userType === 'admin') {
-            this.category = ['當月車費', '上月車費', '搭乘登記', '開車登記'];
-          }
         }
       } catch (error) {
         console.error('Error:', error);
       }
     },
+    // 處理費用紀錄
     formatFareData(data, filterFunc) {
       return data
           .filter(filterFunc)
@@ -432,6 +295,7 @@ export default {
             update_time: this.$moment(rest.update_time).format('YYYY-MM-DD'),
           }));
     },
+    // 處理呈現費用列表
     updateFormattedFareDate(newValue) {
       const currentMonthStart = this.$moment().startOf('month');
       const previousMonthStart = this.$moment().subtract(1, 'month').startOf('month');
@@ -451,6 +315,7 @@ export default {
       // 計算總和並更新相關屬性
       this.calculateTotalFareCount();
     },
+    // 計算下月扣除額
     calculateTotalFareCount() {
       const total = this.formattedFareData.reduce((acc, item) => (item.user_fare_count ? acc + item.user_fare_count : acc), 0);
 
@@ -462,6 +327,7 @@ export default {
         this.fareCountTotal = '尚無紀錄';
       }
     },
+    // 觸發用戶輸入總額計算下月實付
     async countFareData() {
       const { value: fareInput } = await Swal.fire({
         title: '需付搭乘費計算',
@@ -509,6 +375,9 @@ export default {
         const { drive, notDrive } = response.data;
 
         if (response.data) {
+          console.log(drive);
+          console.log(notDrive);
+
           this.driveData = drive;
           this.notDriveData = notDrive;
           await this.formatDriveData();
@@ -722,6 +591,7 @@ export default {
             const response = await this.$http.post(`${import.meta.env.VITE_APP_API}/reserve`, reserveData, config);
             if (response.data) {
               Swal.fire('預約成功！', '您的預約已成功提交。', 'success');
+              await this.getPassengerData();
             }
           } catch (error) {
             console.error('預約錯誤:', error);
@@ -774,40 +644,7 @@ export default {
       const currentMonth = this.$moment().format('YYYY-MM');
       return date.startsWith(currentMonth);
     },
-    // 登出
-    signOut() {
-      // 清除 Vuex 和 localStorage 中的令牌
-      this.$store.dispatch('clearAuthData');
-      localStorage.removeItem('token');
-
-      // 可選：向後端發送登出請求
-      // 如果您的後端需要撤銷令牌，請保留以下代碼
-      const url = `${import.meta.env.VITE_APP_API}/users/sign_out`;
-      this.$http.post(url)
-        .then((response) => {
-          // 登出成功後的處理
-          Swal.fire({
-            title: '登出成功',
-            text: response.data.message,
-            icon: 'success',
-            confirmButtonText: '了解',
-          });
-        })
-        .catch((err) => {
-          // 登出失敗的處理
-          Swal.fire({
-            title: '登出失敗',
-            text: err.response.data.message,
-            icon: 'error',
-            confirmButtonText: '了解',
-          });
-        });
-
-      // 無論後端登出請求是否成功，都導航到登入頁面
-      this.$router.push('/');
-      this.isLoading = false;
-    },
-    // 新增 todo
+    // 新增匯款金額
     async addAmount() {
       const { userType, email } = this.userInfo;
       const { token } = this.$store.state;
@@ -844,8 +681,42 @@ export default {
       }
       this.isLoading = false;
     },
+    // 登出
+    signOut() {
+      // 清除 Vuex 和 localStorage 中的令牌
+      this.$store.dispatch('clearAuthData');
+      localStorage.removeItem('token');
+
+      // 可選：向後端發送登出請求
+      // 如果您的後端需要撤銷令牌，請保留以下代碼
+      const url = `${import.meta.env.VITE_APP_API}/users/sign_out`;
+      this.$http.post(url)
+        .then((response) => {
+          // 登出成功後的處理
+          Swal.fire({
+            title: '登出成功',
+            text: response.data.message,
+            icon: 'success',
+            confirmButtonText: '了解',
+          });
+        })
+        .catch((err) => {
+          // 登出失敗的處理
+          Swal.fire({
+            title: '登出失敗',
+            text: err.response.data.message,
+            icon: 'error',
+            confirmButtonText: '了解',
+          });
+        });
+
+      // 無論後端登出請求是否成功，都導航到登入頁面
+      this.$router.push('/');
+      this.isLoading = false;
+    },
   },
   watch: {
+    // 控制切換tab
     filteredType(newValue) {
       if (newValue && (this.filteredType === '當月車費' || this.filteredType === '上月車費')) {
         this.updateFormattedFareDate(newValue);
@@ -856,6 +727,7 @@ export default {
     ...mapGetters({
       userInfo: 'getUserInfo',
     }),
+    // 日期禁用
     disabledDates() {
       // 創建一個包含所有禁用日期的集合
       const disabledSet = new Set();
@@ -878,6 +750,13 @@ export default {
         }
       });
 
+      if (this.startDate) {
+        disabledSet.add(this.$moment(this.startDate).format('YYYY-MM-DD'));
+      }
+      if (this.endDate) {
+        disabledSet.add(this.$moment(this.endDate).format('YYYY-MM-DD'));
+      }
+
       // 返回一個函數，DatePicker 將使用它來檢查日期是否應該被禁用
       return (date) => {
         const formattedDate = this.$moment(date).format('YYYY-MM-DD');
@@ -893,3 +772,11 @@ export default {
   },
 };
 </script>
+<style>
+@media (min-width: 768px) {
+  .todo-bg {
+    min-height: 100vh;
+    background: linear-gradient(0deg, rgb(216, 254, 255) 0%, rgba(253,187,45,1) 100%);
+  }
+}
+</style>
