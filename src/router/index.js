@@ -4,23 +4,28 @@ const routes = [
   {
     path: '/',
     name: 'logIn',
-    component: () => import('../../../TodoList-Web/src/views/logIn.vue'),
+    component: () => import('../views/logIn.vue'),
+  },
+  {
+    path: '/',
+    name: 'logIn',
+    component: () => import('../views/logIn.vue'),
   },
   {
     path: '/signUp',
     name: 'signUp',
-    component: () => import('../../../TodoList-Web/src/views/signUp.vue'),
+    component: () => import('../views/signUp.vue'),
   },
   {
     path: '/passengerRideShare',
     name: 'passengerRideShare',
-    component: () => import('../../../TodoList-Web/src/views/passengerRideShare.vue'),
+    component: () => import('../views/passengerRideShare.vue'),
     props: (route) => route.params,
   },
   {
     path: '/driverRideShare',
     name: 'driverRideShare',
-    component: () => import('../../../TodoList-Web/src/views/driverRideShare.vue'),
+    component: () => import('../views/driverRideShare.vue'),
     props: (route) => route.params,
   },
 ];
