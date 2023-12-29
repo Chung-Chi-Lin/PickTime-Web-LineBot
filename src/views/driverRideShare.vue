@@ -279,7 +279,6 @@ import {mapGetters} from 'vuex';
 import DatePicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 import "vue-datepicker-next/locale/zh-cn.es";
-import LogIn from "./logIn.vue";
 
 export default {
   components: {
