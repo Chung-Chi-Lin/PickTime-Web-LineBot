@@ -375,9 +375,6 @@ export default {
         const { drive, notDrive } = response.data;
 
         if (response.data) {
-          console.log(drive);
-          console.log(notDrive);
-
           this.driveData = drive;
           this.notDriveData = notDrive;
           await this.formatDriveData();
@@ -401,17 +398,19 @@ export default {
         });
       } else {
         // 如果有 drive 數據，則格式化並添加到數組中
-        this.driveData.forEach(record => {
-          const formattedStartDate = this.formatDate(record.start_date);
-          const formattedEndDate = this.formatDate(record.end_date);
+        if (Array.isArray(this.driveData)) {
+          this.driveData.forEach(record => {
+            const formattedStartDate = this.formatDate(record.start_date);
+            const formattedEndDate = this.formatDate(record.end_date);
 
-          this.formattedDriveData.push({
-            start_date: formattedStartDate,
-            end_date: formattedEndDate,
-            note: record.note,
-            pass_limit: record.pass_limit
+            this.formattedDriveData.push({
+              start_date: formattedStartDate,
+              end_date: formattedEndDate,
+              note: record.note,
+              pass_limit: record.pass_limit
+            });
           });
-        });
+        }
       }
 
       // 繼續處理 notDrive 數據
@@ -481,18 +480,20 @@ export default {
           note: '',
         });
       } else {
-        // 如果有 drive 數據，則格式化並添加到數組中
-        this.takeRideData.forEach(record => {
-          const formattedStartDate = this.formatDate(record.start_date);
-          const formattedEndDate = this.formatDate(record.end_date);
+        if (Array.isArray(this.takeRideData)) {
+          // 如果有 drive 數據，則格式化並添加到數組中
+          this.takeRideData.forEach(record => {
+            const formattedStartDate = this.formatDate(record.start_date);
+            const formattedEndDate = this.formatDate(record.end_date);
 
-          this.formattedPassengerData.push({
-            id: record.id,
-            start_date: formattedStartDate,
-            end_date: formattedEndDate,
-            note: record.note
+            this.formattedPassengerData.push({
+              id: record.id,
+              start_date: formattedStartDate,
+              end_date: formattedEndDate,
+              note: record.note
+            });
           });
-        });
+        }
       }
 
       // 繼續處理 notDrive 數據
@@ -731,24 +732,25 @@ export default {
     disabledDates() {
       // 創建一個包含所有禁用日期的集合
       const disabledSet = new Set();
+      if (Array.isArray(this.notDriveData)) {
+        // 將每個不開車的日期範圍添加到集合中
+        this.notDriveData.forEach(item => {
+          const start = this.$moment(item.start_date);
+          const end = this.$moment(item.end_date);
 
-      // 將每個不開車的日期範圍添加到集合中
-      this.notDriveData.forEach(item => {
-        const start = this.$moment(item.start_date);
-        const end = this.$moment(item.end_date);
-
-        // 處理區間
-        if (start.isBefore(end, 'day')) {
-          let current = start;
-          while (current.isSameOrBefore(end)) {
-            disabledSet.add(current.format('YYYY-MM-DD'));
-            current.add(1, 'days');
+          // 處理區間
+          if (start.isBefore(end, 'day')) {
+            let current = start;
+            while (current.isSameOrBefore(end)) {
+              disabledSet.add(current.format('YYYY-MM-DD'));
+              current.add(1, 'days');
+            }
+          } else {
+            // 處理單日
+            disabledSet.add(start.format('YYYY-MM-DD'));
           }
-        } else {
-          // 處理單日
-          disabledSet.add(start.format('YYYY-MM-DD'));
-        }
-      });
+        });
+      }
 
       if (this.startDate) {
         disabledSet.add(this.$moment(this.startDate).format('YYYY-MM-DD'));

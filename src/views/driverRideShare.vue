@@ -150,7 +150,7 @@
             </div>
           </div>
           <div class="bg-transparent d-flex justify-content-end mt-3">
-            <button type="button" class="btn btn-info border-0 btn-h p-2 px-3" @click="reserveDate">預約</button>
+            <button type="button" class="btn btn-info border-0 btn-h p-2 px-3" @click="reserveDate">登記</button>
           </div>
           <h3 class="mt-4 ms-1 mb-0"><span
               class="badge bg-primary p-2">{{ driveData ? '司機表' : '司機尚無開放預約' }}</span></h3>
@@ -235,7 +235,7 @@
                   {{ filteredType === '當月車費' ? '本月匯款＞ ' : '上月匯款＞ ' }}
                 </label>
                 <label class="form-check-label d-block ps-4 py-2">乘客:{{ item.name }} 費用:{{ item.fare }}</label>
-                <label class="text-end d-block">
+                <label class="text-end d-block" v-if="item.date !== 'Invalid date'">
                   紀錄日期:{{ item.date }}
                 </label>
                 <!-- 費用紀錄 -->
@@ -249,7 +249,7 @@
                   <label class="form-check-label d-block ps-4 py-2">
                     NT${{ fareCount.userFareCount }}，原因: {{ fareCount.userRemark }}
                   </label>
-                  <label class="text-end d-block">
+                  <label class="text-end d-block" v-if="fareCount.date">
                     紀錄日期:{{ this.$moment(fareCount.date).format('YYYY-MM-DD') }}
                   </label>
                 </div>
@@ -266,7 +266,7 @@
         </div>
         <div class="card-footer bg-transparent d-flex justify-content-between pt-3"
              v-if="filteredType !== '搭乘登記' && filteredType !== '開車登記'">
-          <p class="pt-3"><span class="fs-5">{{ formattedFareData.length }}</span> 則乘客車費紀錄</p>
+          <p v-if="formattedFareData" class="pt-3"><span class="fs-5">{{ formattedFareData.length }}</span> 則乘客車費紀錄</p>
           <button type="button" class="btn btn-info my-2 border-0 btn-h" @click="countFareData">當前紀錄計算</button>
         </div>
       </div>
@@ -348,10 +348,11 @@ export default {
     // 計算匯款收入
     calculateTotalFareCount() {
       let totalFare = 0;
-
-      this.formattedFareData.forEach(item => {
-        totalFare += item.fare; // 加總基本費用
-      });
+      if (this.formattedFareData) {
+        this.formattedFareData.forEach(item => {
+          totalFare += item.fare; // 加總基本費用
+        });
+      }
 
       if (totalFare > 0) {
         this.fareCountTotal = `匯款收入${totalFare}元`;
@@ -665,7 +666,6 @@ export default {
             };
           });
         }
-        console.log(this.formattedPassengerData)
       } catch (error) {
         console.error('Error:', error);
       }

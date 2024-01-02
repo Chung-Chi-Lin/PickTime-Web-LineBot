@@ -203,7 +203,7 @@ export default {
       const data = {
         email: this.user.email,
         name: this.user.userName,
-        userType: this.user.email.includes('z0925955648@gmail.com') ? 'admin' : this.user.userType,
+        userType: this.user.userType,
         password: this.user.password,
         lineId: this.user.lineId,
       };
