@@ -22,7 +22,7 @@ jobs:
       - name: Print VITE_APP_API Environment Variable
         run: echo "VITE_APP_API=${{ secrets.VITE_APP_API }}"
         env:
-        VITE_APP_API: ${{ secrets.VITE_APP_API }}
+          VITE_APP_API: ${{ secrets.VITE_APP_API }}
 
       - name: Build Project
         run: npm run build
