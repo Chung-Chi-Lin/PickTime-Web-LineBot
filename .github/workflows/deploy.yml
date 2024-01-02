@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install Dependencies
         run: npm install
@@ -30,7 +30,7 @@ jobs:
           VITE_APP_API: ${{ secrets.VITE_APP_API }}  # Using the secret as an environment variable
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@4.3.1
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           branch: gh-pages
