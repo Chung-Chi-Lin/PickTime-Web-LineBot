@@ -30,4 +30,3 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           branch: gh-pages
           folder: dist
-
