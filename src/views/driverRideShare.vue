@@ -427,7 +427,7 @@ export default {
           // 顯示計算後的總費用
           formatPassengerFare += `乘客:${passenger.name}，下月需付:NT$ ${totalFare}<br>`;
         });
-        Swal.fire('乘客下月應付額計算', formatPassengerFare, 'warning');
+        Swal.fire('乘客下月應付額試算', formatPassengerFare, 'warning');
       } else {
         // 顯示錯誤訊息
         Swal.fire('錯誤', '請輸入有效的金額', 'error');

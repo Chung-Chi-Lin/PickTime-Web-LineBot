@@ -82,6 +82,7 @@ export default {
           this.$store.dispatch('saveToken', token);
           this.$store.dispatch('saveUserInfo', response.data.userInfo);
           localStorage.setItem('token', token);
+          localStorage.setItem('userInfo', JSON.stringify(response.data.userInfo));
 
           // 設置 axios 的默認授權頭部
           this.$http.defaults.headers.common.Authorization = `Bearer ${token}`;

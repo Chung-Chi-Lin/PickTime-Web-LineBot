@@ -16,6 +16,20 @@ import router from './router';
 import { currency, date } from './methods/filters';
 import store from './store'; // 引入 Vuex store
 
+// 檢查 localStorage 中是否有 token
+const token = localStorage.getItem('token');
+const userInfo = localStorage.getItem('userInfo');
+
+if (token) {
+	store.dispatch('saveToken', token);
+	axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+}
+
+if (userInfo) {
+	const parsedUserInfo = JSON.parse(userInfo);
+	store.dispatch('saveUserInfo', parsedUserInfo);
+}
+
 const app = createApp(App);
 // 註冊全域 千分號、日期
 app.config.globalProperties.$filters = {
