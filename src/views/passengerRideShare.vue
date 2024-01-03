@@ -589,7 +589,7 @@ export default {
 
           // 發送預約請求到後端
           try {
-            const response = await this.$http.post(`${import.meta.env.VITE_APP_API}/reserve`, reserveData, config);
+            const response = await this.$http.post(`${import.meta.env.VITE_APP_API}/passenger_reserve`, reserveData, config);
             if (response.data) {
               Swal.fire('預約成功！', '您的預約已成功提交。', 'success');
               await this.getPassengerData();
