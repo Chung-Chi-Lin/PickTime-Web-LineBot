@@ -31,7 +31,7 @@
       </div>
     </header>
     <main class="container pb-5">
-      <div class="input-group mb-3" v-if="filteredType === '當月車費' && userInfo.userType === '乘客'">
+      <div class="input-group mb-3" v-if="filteredType === '當月車費'">
         <span class="input-group-text fs-4">$</span>
         <input v-model.number="amount" type="number" onkeyup="value=value.replace(/D+/g, 0)"
                class="form-control border-0 py-2" placeholder="輸入匯款金額" id="numberInput">
@@ -264,7 +264,7 @@ export default {
     // ===== 費用處理 =====
     // 取得乘客當前費用紀錄
     async getFareData() {
-      const { userType, email } = this.userInfo;
+      const { email } = this.userInfo;
       const { token } = this.$store.state;
 
       const config = {

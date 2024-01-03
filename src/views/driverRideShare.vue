@@ -41,7 +41,7 @@
       </div>
     </header>
     <main class="container pb-5">
-      <div class="input-group mb-3" v-if="filteredType === '當月車費' && userInfo.userType === '司機'">
+      <div class="input-group mb-3" v-if="filteredType === '當月車費'">
         <span class="input-group-text fs-4">$</span>
         <input v-model.number="amount" type="number"
                class="form-control border-0 py-2" placeholder="輸入扣除金額" id="numberInput">
