@@ -445,19 +445,21 @@ export default {
           Authorization: `Bearer ${token}`,
         },
       };
-      const passengerListHtml = this.passengerFareData.passengersResult.map(passenger =>
-          `<p>乘客:${passenger.line_user_name}，ID: ${passenger.line_user_id}</p>`
+      const passengerSelectHtml = this.passengerFareData.passengersResult.map(passenger =>
+          `<option value="${passenger.line_user_id}">${passenger.line_user_name}</option>`
       ).join('');
 
       const inputOptions = {
         title: '新增搭乘費用紀錄',
-        html:
-            '<input id="swal-input1" class="swal2-input" placeholder="乘客 ID">' +
-            '<input id="swal-input2" class="swal2-input" placeholder="備註">' +
-            passengerListHtml,
+        html: `
+          <select id="swal-input1" class="swal2-input">${passengerSelectHtml}</select>
+          <input id="swal-input2" class="swal2-input" placeholder="備註">
+        `,
         focusConfirm: false,
         preConfirm: () => {
-          const userId = document.getElementById('swal-input1').value;
+          const selectElement = document.getElementById('swal-input1');
+          const userId = selectElement.value;
+          const userName = selectElement.options[selectElement.selectedIndex].text; // 获取选中的乘客名字
           const userRemark = document.getElementById('swal-input2').value;
           const fareAmount = this.amount;
 
@@ -466,17 +468,17 @@ export default {
             return;
           }
 
-          return {userId, userRemark, fareAmount};
+          return {userId, userName, userRemark, fareAmount};
         }
       };
 
       const result = await Swal.fire(inputOptions);
 
       if (result.isConfirmed) {
-        const {userId, userRemark, fareAmount} = result.value;
+        const { userId, userName, userRemark, fareAmount } = result.value;
         Swal.fire({
           title: '確認信息',
-          html: `確認將此用戶新增一筆搭乘紀錄?<br>ID: ${userId}<br>備註: ${userRemark}<br>金額: NT${fareAmount}`,
+          html: `確認將此用戶新增一筆搭乘紀錄?<br>乘客: ${userName}<br>ID前五碼: ${userId.slice(0,5)}<br>備註: ${userRemark}<br>金額: NT${fareAmount}`,
           showCancelButton: true,
           confirmButtonText: '確定',
           cancelButtonText: '取消',
@@ -846,5 +848,12 @@ export default {
     min-height: 100vh;
     background: linear-gradient(0deg, rgb(216, 254, 255) 0%, rgba(253, 187, 45, 1) 100%);
   }
+}
+
+#swal-input1 {
+  width: 70%;
+}
+#swal-input2 {
+  width: 70%;
 }
 </style>
