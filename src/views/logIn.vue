@@ -98,7 +98,7 @@ export default {
           this.isLoading = false;
           Swal.fire({
             title: '登入失敗',
-            text: err.response.data.message || '登入時發生錯誤，請重試。',
+            text: err.response.data.message || '伺服器重啟中，3分鐘後重試。',
             icon: 'error',
             confirmButtonText: '了解',
           });

@@ -41,7 +41,7 @@
       </div>
     </header>
     <main class="container pb-5">
-      <div class="input-group mb-3" v-if="filteredType === '當月車費'">
+      <div class="input-group mb-3" v-if="filteredType === '當月車費' || filteredType === '上月車費'">
         <span class="input-group-text fs-4">$</span>
         <input v-model.number="amount" type="number"
                class="form-control border-0 py-2" placeholder="輸入扣除金額" id="numberInput">
@@ -328,7 +328,11 @@ export default {
           this.passengerFareData.currentMonthFares = this.formatPassengerFares(currentMonthFares);
           this.passengerFareData.previousMonthFares = this.formatPassengerFares(previousMonthFares);
           this.passengerFareData.passengersResult = passengersResult;
-          this.formattedFareData = this.passengerFareData.currentMonthFares;
+          if (this.filteredType === '上月車費') {
+            this.formattedFareData = this.passengerFareData.previousMonthFares;
+          } else if (this.filteredType === '當月車費') {
+            this.formattedFareData = this.passengerFareData.currentMonthFares;
+          }
           this.calculateTotalFareCount(); // 計算匯款收入
         }
       } catch (error) {
@@ -435,7 +439,7 @@ export default {
     },
     // 新增對應乘客搭乘費用計算
     async addAmount() {
-      if (parseInt(this.amount) === NaN || !this.amount) {
+      if (parseInt(this.amount) === NaN || this.amount === null) {
         Swal.fire('錯誤', '請輸入正數或負數金額', 'error');
         return
       }
@@ -449,11 +453,24 @@ export default {
           `<option value="${passenger.line_user_id}">${passenger.line_user_name}</option>`
       ).join('');
 
+      const getLastMonthDates = () => {
+        const now = new Date();
+        const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const lastDayLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        return {
+          minDate: firstDayLastMonth.toISOString().split('T')[0],
+          maxDate: lastDayLastMonth.toISOString().split('T')[0]
+        };
+      };
+
+      const { minDate, maxDate } = getLastMonthDates();
+
       const inputOptions = {
         title: '新增搭乘費用紀錄',
         html: `
           <select id="swal-input1" class="swal2-input">${passengerSelectHtml}</select>
           <input id="swal-input2" class="swal2-input" placeholder="備註">
+          ${this.filteredType === '上月車費' ? `<input id="swal-input3" type="date" class="swal2-input" min="${minDate}" max="${maxDate}">` : ''}
         `,
         focusConfirm: false,
         preConfirm: () => {
@@ -461,21 +478,22 @@ export default {
           const userId = selectElement.value;
           const userName = selectElement.options[selectElement.selectedIndex].text; // 获取选中的乘客名字
           const userRemark = document.getElementById('swal-input2').value;
+          const selectedDate = this.filteredType === '上月車費' ? document.getElementById('swal-input3').value : null;
           const fareAmount = this.amount;
 
-          if (!userId || !userRemark) {
-            Swal.showValidationMessage('乘客 ID 和備註不能為空');
+          if (!userId || !userRemark || !selectedDate) {
+            Swal.showValidationMessage('皆為必要項目不能為空');
             return;
           }
 
-          return {userId, userName, userRemark, fareAmount};
+          return {userId, userName, userRemark, selectedDate, fareAmount};
         }
       };
 
       const result = await Swal.fire(inputOptions);
 
       if (result.isConfirmed) {
-        const { userId, userName, userRemark, fareAmount } = result.value;
+        const { userId, userName, userRemark, selectedDate,fareAmount } = result.value;
         Swal.fire({
           title: '確認信息',
           html: `確認將此用戶新增一筆搭乘紀錄?<br>乘客: ${userName}<br>ID前五碼: ${userId.slice(0,5)}<br>備註: ${userRemark}<br>金額: NT${fareAmount}`,
@@ -484,7 +502,11 @@ export default {
           cancelButtonText: '取消',
         }).then(async (result) => {
           if (result.isConfirmed) {
-            const formattedDate = this.$moment().format('YYYY-MM-DD HH:mm:ss');
+            let formattedDate = this.$moment().format('YYYY-MM-DD HH:mm:ss');
+            if (this.filteredType === '上月車費') {
+              formattedDate = selectedDate
+            }
+
             // 構造發送到後端的資料
             const postData = {
               userId,
@@ -498,13 +520,13 @@ export default {
               const response = await this.$http.post(`${import.meta.env.VITE_APP_API}/fare/add_fare_count`, postData, config);
               Swal.fire('成功', response.data.message, 'success');
               this.getFareData();
+              this.filteredType === '上月車費';
             } catch (error) {
               Swal.fire('錯誤', error.response.data.message || '無法新增紀錄', 'error');
               console.error('Error:', error);
             }
             this.isLoading = false;
             this.amount = null;
-            this.getFareData();
           }
         });
       }
