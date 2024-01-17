@@ -798,7 +798,7 @@ export default {
     },
     // 登出
     signOut() {
-      // 清除 Vuex 和 localStorage 中的令牌
+      // 清除 Vuex 和 localStorage 中的令牌。
       this.$store.dispatch('clearAuthData');
       localStorage.removeItem('token');
 
