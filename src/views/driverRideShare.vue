@@ -481,7 +481,10 @@ export default {
           const selectedDate = this.filteredType === '上月車費' ? document.getElementById('swal-input3').value : null;
           const fareAmount = this.amount;
 
-          if (!userId || !userRemark || !selectedDate) {
+          if (!userId || !userRemark) {
+            if (this.filteredType === '上月車費' && !selectedDate) {
+              Swal.showValidationMessage('日期為必要項目不能為空');
+            }
             Swal.showValidationMessage('皆為必要項目不能為空');
             return;
           }
