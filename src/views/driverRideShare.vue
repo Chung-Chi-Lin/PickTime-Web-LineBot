@@ -153,11 +153,11 @@
             <button type="button" class="btn btn-info border-0 btn-h p-2 px-3" @click="reserveDate">登記</button>
           </div>
           <h3 class="mt-4 ms-1 mb-0"><span
-              class="badge bg-primary p-2">{{ driveData ? '司機表' : '司機尚無開放預約' }}</span></h3>
-          <div v-if="driveData">
+              class="badge bg-primary p-2">{{ driveData === null && notDriveData === null ? '司機尚無開放預約' : '司機表' }}</span></h3>
+          <div v-if="driveData !== null || notDriveData !== null">
             <ul class="list-group list-group-flush"
                 v-for="(item, index) in formattedDriveData" :key="item.id">
-              <li class="list-group-item text-start border-bottom">
+              <li class="list-group-item text-start border-bottom" v-if="item.id !== null">
                 <div class="mb-3">
                   <label v-if="item.pass_limit" class="text-end d-block mb-3">
                     <h5>{{ item.pass_limit ? `乘客限:${item.pass_limit}位` : '' }}</h5>
@@ -168,7 +168,7 @@
                     </button>
                   </div>
                   <label class="form-check-label d-block mb-2">
-                    <h5 v-if="index === 0 && item.pass_limit">*本月開車日＞ </h5>
+                    <h5 v-if="index === 0 && item.pass_limit !== null">*本月開車日＞ </h5>
                     <h5 v-else>不開車日＞ </h5>
                     備註:{{ item.note ?? '無備註' }}
                   </label>
@@ -679,11 +679,20 @@ export default {
         if (response.data && response.data.passengerData) {
           this.formattedPassengerData = response.data.passengerData.map(passenger => {
             const formatDatesArray = (dates) => {
-              return dates ? dates.map(date => ({
-                ...date,
-                start_date: this.$moment(date.start_date).format('YYYY-MM-DD'),
-                end_date: this.$moment(date.end_date).format('YYYY-MM-DD')
-              })) : null;
+              return dates ? dates.map(date => {
+                if (date.start_date === date.end_date) {
+                  return {
+                    ...date,
+                    start_date: this.$moment(date.start_date).format('YYYY-MM-DD')
+                  };
+                } else {
+                  return {
+                    ...date,
+                    start_date: this.$moment(date.start_date).format('YYYY-MM-DD'),
+                    end_date: this.$moment(date.end_date).format('YYYY-MM-DD')
+                  };
+                }
+              }) : null;
             };
 
             return {
