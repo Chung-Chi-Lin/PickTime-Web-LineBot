@@ -51,10 +51,6 @@
           </button>
         </label>
       </div>
-      <div v-if="!userInfo.userName" class="row row-cols-1 d-flex justify-content-center my-5">
-        <h3 class="col text-center">目前尚無待辦資料</h3>
-        <img class="img-fluid col-4 " src="../assets/empty.png" alt="">
-      </div>
       <!-- todo card -->
       <div class="card">
         <div class="card-header bg-transparent text-center">
