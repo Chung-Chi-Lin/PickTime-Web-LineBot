@@ -401,39 +401,56 @@ export default {
     },
     // 觸發用戶輸入總額計算下月實付
     async countFareData() {
-      const {value: fareInput} = await Swal.fire({
+      const { value: fareInput } = await Swal.fire({
         title: '下月需付搭乘費計算',
-        text: '請提供下月乘客需實付金額進行扣款計算',
-        input: 'number',
-        inputPlaceholder: '輸入您的金額',
-        inputAttributes: {
-          min: 1,
+        html: `
+      <select id="swal-select-member" class="swal2-input">
+        <option value="all">全部成員</option>
+        ${this.passengerFareData.passengersResult.map(passenger =>
+          `<option value="${passenger.line_user_name}">${passenger.line_user_name}</option>`
+        ).join('')}
+      </select>
+      <input id="swal-input-fare" type="number" class="swal2-input" placeholder="輸入您的金額" min="1">
+    `,
+        preConfirm: () => {
+          const selectedMemberId = document.getElementById('swal-select-member').value;
+          const enteredFare = document.getElementById('swal-input-fare').value;
+          return {
+            member: selectedMemberId,
+            fare: enteredFare
+          };
         },
-        showCancelButton: true,
-        confirmButtonText: '確認',
-        cancelButtonText: '取消',
       });
 
-      if (fareInput) {
+      if (fareInput.member && fareInput.fare) {
         let formatPassengerFare = '';
 
-        this.formattedFareData.forEach(passenger => {
-          // 從初始 fare 開始計算
-          let totalFare = parseInt(fareInput);
+        const selectedMember = fareInput.member;
+        const enteredFare = parseInt(fareInput.fare);
 
-          // 加上 fareCount 中的 userFareCount
-          if (passenger.fareCount.length > 0) {
+        if (selectedMember === 'all') {
+          // 計算全部成員
+          this.formattedFareData.forEach(passenger => {
+            let totalFare = enteredFare;
             passenger.fareCount.forEach(fareCountItem => {
               totalFare += fareCountItem.userFareCount;
             });
-          }
+            formatPassengerFare += `乘客:${passenger.name}，下月需付:NT$ ${totalFare}<br>`;
+          });
+        } else {
+          // 單一成員
+          const passenger = this.formattedFareData.find(p => p.name === selectedMember);
+          let totalFare = enteredFare;
 
-          // 顯示計算後的總費用
-          formatPassengerFare += `乘客:${passenger.name}，下月需付:NT$ ${totalFare}<br>`;
-        });
+          passenger.fareCount.forEach(fareCountItem => {
+            console.log('fareCountItem', fareCountItem);
+            totalFare += fareCountItem.userFareCount;
+          });
+          formatPassengerFare = `乘客:${passenger.name}，下月需付:NT$ ${totalFare}<br>`;
+        }
+
         Swal.fire('乘客下月應付額試算', formatPassengerFare, 'warning');
       } else {
-        // 顯示錯誤訊息
         Swal.fire('錯誤', '請輸入有效的金額', 'error');
       }
     },
@@ -476,7 +493,7 @@ export default {
         preConfirm: () => {
           const selectElement = document.getElementById('swal-input1');
           const userId = selectElement.value;
-          const userName = selectElement.options[selectElement.selectedIndex].text; // 获取选中的乘客名字
+          const userName = selectElement.options[selectElement.selectedIndex].text; // 乘客名字
           const userRemark = document.getElementById('swal-input2').value;
           const selectedDate = this.filteredType === '上月車費' ? document.getElementById('swal-input3').value : null;
           const fareAmount = this.amount;
@@ -887,6 +904,7 @@ export default {
 #swal-input1 {
   width: 70%;
 }
+
 #swal-input2 {
   width: 70%;
 }

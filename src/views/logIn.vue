@@ -1,12 +1,22 @@
 <template>
   <main class="container pt-5">
     <loading :active="isLoading">
-    <!--     樣式包進 loading 元件內     -->
-    <div class="loadingio-spinner-bean-eater-iylmkqp50l"><div class="ldio-t0eby9sr4hr">
-      <div><div></div><div></div><div></div></div><div><div></div><div></div><div></div></div>
+      <!--     樣式包進 loading 元件內     -->
+      <div class="loadingio-spinner-bean-eater-iylmkqp50l">
+        <div class="ldio-t0eby9sr4hr">
+          <div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
       </div>
-    </div>
-    <!--     樣式包進 loading 元件內     -->
+      <!--     樣式包進 loading 元件內     -->
     </loading>
     <div class="row p-md-5">
       <div class="col-6 me-5 d-none d-md-block">
@@ -27,31 +37,45 @@
         </div>
         <v-form v-slot="{ errors }" class="container">
           <div class="form-group pt-4">
-              <label for="Email">Email</label>
-              <v-field id="Email" name="email" label="Email欄位" type="text" class="form-control"
-              :class="{ 'is-invalid': errors['email'] }"
-              placeholder="請輸入Email" rules="email|required"
-              v-model="user.email"
-              style="height:70px"></v-field>
-              <ErrorMessage name="email" class="invalid-feedback"></ErrorMessage>
+            <label for="Email">Email</label>
+            <v-field id="Email" name="email" label="Email欄位" type="text" class="form-control"
+                     :class="{ 'is-invalid': errors['email'] }"
+                     placeholder="請輸入Email" rules="email|required"
+                     v-model="user.email"
+                     style="height:70px;"></v-field>
+            <ErrorMessage name="email" class="invalid-feedback"></ErrorMessage>
           </div>
           <div class="form-group pt-4">
+            <div class="d-flex justify-content-between align-items-center">
               <label for="pwd">密碼</label>
-              <v-field id="pwd" name="password" label="密碼" type="password" class="form-control"
+              <i
+                :class="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"
+                class="me-1 fs-3 bi"
+                style="cursor: pointer;"
+                @click="showPassword = !showPassword"
+              ></i>
+            </div>
+            <v-field
+              id="pwd"
+              name="password"
+              :type="showPassword ? 'text' : 'password'"
+              class="form-control"
               :class="{ 'is-invalid': errors['password'] }"
-              placeholder="請輸入密碼" rules="required|min:6"
+              placeholder="請輸入密碼"
+              rules="required|min:6"
               v-model="user.password"
-              style="height:70px"></v-field>
-              <ErrorMessage name="password" class="invalid-feedback"></ErrorMessage>
+              style="height:70px"
+            ></v-field>
+            <ErrorMessage name="password" class="invalid-feedback"></ErrorMessage>
           </div>
           <div class="d-grid gap-4 col-4 mx-auto pt-5">
-            <button class="btn btn-dark py-md-3" type="button" @click="logIn">登入</button>
+            <button class="btn btn-dark py-md-3" type="button" @keyup.enter="logIn" @click="logIn">登入</button>
             <button class="btn btn-h" type="button" @click="goSignUp">註冊帳號</button>
           </div>
         </v-form>
       </div>
     </div>
-  </main >
+  </main>
 </template>
 
 <script>
@@ -65,6 +89,7 @@ export default {
         password: '',
       },
       isLoading: false,
+      showPassword: false,
     };
   },
   methods: {
@@ -77,7 +102,7 @@ export default {
       this.isLoading = true;
       this.$http.post(url, data)
         .then((response) => {
-          const { token } = response.data;
+          const {token} = response.data;
           // 將 token 儲存到 Vuex 和 localStorage
           this.$store.dispatch('saveToken', token);
           this.$store.dispatch('saveUserInfo', response.data.userInfo);
@@ -99,6 +124,9 @@ export default {
           let errStr = '';
           if (err.response.status === 500) {
             errStr = '伺服器重啟中，3分鐘後重試。';
+          }
+          if(err.response.data === 'operation timed out for an unknown reason') {
+            errStr = '連線逾時伺服器重啟，請重新登入。';
           }
           Swal.fire({
             title: '登入失敗',
