@@ -96,9 +96,13 @@ export default {
         })
         .catch((err) => {
           this.isLoading = false;
+          let errStr = '';
+          if (err.response.status === 500) {
+            errStr = '伺服器重啟中，3分鐘後重試。';
+          }
           Swal.fire({
             title: '登入失敗',
-            text: err.response.data.message || '伺服器重啟中，3分鐘後重試。',
+            text: err.response.data || errStr,
             icon: 'error',
             confirmButtonText: '了解',
           });
