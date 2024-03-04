@@ -69,7 +69,7 @@
             <ErrorMessage name="password" class="invalid-feedback"></ErrorMessage>
           </div>
           <div class="d-grid gap-4 col-4 mx-auto pt-5">
-            <button class="btn btn-dark py-md-3" type="button" @keyup.enter="logIn" @click="logIn">登入</button>
+            <button class="btn btn-dark py-md-3" type="button" @keyup.enter="logIn" @click="logIn" :disabled="user.password.length < 6">登入</button>
             <button class="btn btn-h" type="button" @click="goSignUp">註冊帳號</button>
           </div>
         </v-form>
