@@ -439,7 +439,6 @@ export default {
           let totalFare = enteredFare;
 
           passenger.fareCount.forEach(fareCountItem => {
-            console.log('fareCountItem', fareCountItem);
             totalFare += fareCountItem.userFareCount;
           });
           formatPassengerFare = `乘客:${passenger.name}，下月需付:NT$ ${totalFare}<br>`;
